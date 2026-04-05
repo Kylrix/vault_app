@@ -1,4 +1,5 @@
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -31,18 +32,18 @@ class _VaultAppState extends State<VaultApp> {
       navigatorKey: _navigatorKey,
       store: _store!,
     );
-    _desktopIntegration!.initialize();
+    unawaited(_desktopIntegration!.initialize());
   }
 
   @override
   void dispose() {
     _store?.removeListener(_syncDesktopIntegration);
-    _desktopIntegration?.dispose();
+    unawaited(_desktopIntegration?.dispose());
     super.dispose();
   }
 
   void _syncDesktopIntegration() {
-    _desktopIntegration?.refresh();
+    unawaited(_desktopIntegration?.refresh());
   }
 
   @override

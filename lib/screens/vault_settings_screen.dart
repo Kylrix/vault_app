@@ -30,6 +30,22 @@ class VaultSettingsScreen extends StatelessWidget {
           onChanged: (value) => store.saveSettings(settings.copyWith(keepRunningInBackground: value)),
           title: const Text('Keep vault running when window closes'),
         ),
+        const SizedBox(height: 8),
+        DropdownButtonFormField<int>(
+          value: settings.autoLockMinutes,
+          decoration: const InputDecoration(labelText: 'Auto-lock after inactivity'),
+          items: const [
+            DropdownMenuItem(value: 1, child: Text('1 minute')),
+            DropdownMenuItem(value: 5, child: Text('5 minutes')),
+            DropdownMenuItem(value: 10, child: Text('10 minutes')),
+            DropdownMenuItem(value: 15, child: Text('15 minutes')),
+            DropdownMenuItem(value: 30, child: Text('30 minutes')),
+          ],
+          onChanged: (value) {
+            if (value == null) return;
+            store.saveSettings(settings.copyWith(autoLockMinutes: value));
+          },
+        ),
         const SizedBox(height: 12),
         FilledButton(
           onPressed: () => _changePassword(context),
