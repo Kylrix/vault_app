@@ -26,6 +26,10 @@ class VaultQuickLauncher extends StatelessWidget {
                 trailing: Wrap(
                   children: [
                     IconButton(
+                      icon: const Icon(Icons.person_outline),
+                      onPressed: () => Clipboard.setData(ClipboardData(text: credential.username)),
+                    ),
+                    IconButton(
                       icon: const Icon(Icons.copy),
                       onPressed: () => Clipboard.setData(ClipboardData(text: credential.password)),
                     ),
@@ -34,6 +38,17 @@ class VaultQuickLauncher extends StatelessWidget {
                       onPressed: credential.url.isEmpty ? null : () => launchUrl(Uri.parse(credential.url)),
                     ),
                   ],
+                ),
+              ),
+            ),
+            const Divider(),
+            ...store.totpItems.map(
+              (item) => ListTile(
+                title: Text(item.issuer),
+                subtitle: Text(item.accountName),
+                trailing: IconButton(
+                  icon: const Icon(Icons.copy),
+                  onPressed: () => Clipboard.setData(ClipboardData(text: store.generateTotpCode(item))),
                 ),
               ),
             ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../core/services/vault_store.dart';
 import '../widgets/vault_sections.dart';
@@ -14,6 +15,31 @@ class VaultDashboardScreen extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       children: [
         Text('Vault Overview', style: Theme.of(context).textTheme.headlineMedium),
+        const SizedBox(height: 16),
+        if (store.user != null)
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.verified_user_outlined),
+              title: Text(store.user!.name.isEmpty ? 'Signed in' : store.user!.name),
+              subtitle: Text(store.user!.email),
+              trailing: TextButton(
+                onPressed: store.logout,
+                child: const Text('Sign out'),
+              ),
+            ),
+          )
+        else
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.login),
+              title: const Text('Accounts session not detected'),
+              subtitle: const Text('Sign in through the root Accounts app to sync the universal session.'),
+              trailing: TextButton(
+                onPressed: () => launchUrl(Uri.parse('https://accounts.kylrix.local')),
+                child: const Text('Open Accounts'),
+              ),
+            ),
+          ),
         const SizedBox(height: 16),
         Wrap(
           spacing: 16,
