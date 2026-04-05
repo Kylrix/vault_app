@@ -75,8 +75,8 @@ class VaultStore extends ChangeNotifier {
       final info = await account.get();
       user = AppwriteUser(
         id: info.$id,
-        name: info.name ?? '',
-        email: info.email ?? '',
+        name: info.name,
+        email: info.email,
       );
     } catch (_) {
       user = null;
@@ -113,15 +113,21 @@ class VaultStore extends ChangeNotifier {
   }
 
   Future<void> refreshUnlocked() async {
-    credentials = (await _database.listRecords(kind: 'credential'))
-        .map(_decodeCredentialRecord)
-        .toList();
-    folders = (await _database.listRecords(kind: 'folder'))
-        .map(_decodeFolderRecord)
-        .toList();
-    totpItems = (await _database.listRecords(kind: 'totp'))
-        .map(_decodeTotpRecord)
-        .toList();
+    final credentialRows = await _database.listRecords(kind: 'credential');
+    final folderRows = await _database.listRecords(kind: 'folder');
+    final totpRows = await _database.listRecords(kind: 'totp');
+    credentials = [];
+    folders = [];
+    totpItems = [];
+    for (final row in credentialRows) {
+      credentials.add(await _decodeCredentialRecord(row));
+    }
+    for (final row in folderRows) {
+      folders.add(await _decodeFolderRecord(row));
+    }
+    for (final row in totpRows) {
+      totpItems.add(await _decodeTotpRecord(row));
+    }
     final payload = await _database.readSettings();
     if (payload != null) {
       settings = VaultSettings.fromJson(
@@ -293,18 +299,18 @@ class VaultStore extends ChangeNotifier {
     }).toList();
   }
 
-  VaultCredential _decodeCredentialRecord(Map<String, Object?> row) {
-    final payload = _crypto.decryptString(row['encrypted_payload'] as String);
+  Future<VaultCredential> _decodeCredentialRecord(Map<String, Object?> row) async {
+    final payload = await _crypto.decryptString(row['encrypted_payload'] as String);
     return VaultCredential.fromJson(jsonDecode(payload) as Map<String, dynamic>);
   }
 
-  VaultFolder _decodeFolderRecord(Map<String, Object?> row) {
-    final payload = _crypto.decryptString(row['encrypted_payload'] as String);
+  Future<VaultFolder> _decodeFolderRecord(Map<String, Object?> row) async {
+    final payload = await _crypto.decryptString(row['encrypted_payload'] as String);
     return VaultFolder.fromJson(jsonDecode(payload) as Map<String, dynamic>);
   }
 
-  VaultTotp _decodeTotpRecord(Map<String, Object?> row) {
-    final payload = _crypto.decryptString(row['encrypted_payload'] as String);
+  Future<VaultTotp> _decodeTotpRecord(Map<String, Object?> row) async {
+    final payload = await _crypto.decryptString(row['encrypted_payload'] as String);
     return VaultTotp.fromJson(jsonDecode(payload) as Map<String, dynamic>);
   }
 
