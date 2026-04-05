@@ -94,4 +94,10 @@ class VaultDatabase {
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
+
+  Future<void> wipe() async {
+    final db = await database;
+    await db.delete('vault_records');
+    await db.delete('vault_settings');
+  }
 }

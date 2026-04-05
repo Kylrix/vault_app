@@ -247,6 +247,7 @@ class VaultStore extends ChangeNotifier {
 
   Future<void> resetVault() async {
     await _crypto.reset();
+    await _database.wipe();
     isUnlocked = false;
     hasInitializedVault = false;
     needsMasterPassword = false;
