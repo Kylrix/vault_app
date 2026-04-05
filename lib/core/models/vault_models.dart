@@ -128,18 +128,21 @@ class VaultSettings {
     required this.quickUnlockEnabled,
     required this.autofillEnabled,
     required this.desktopHotkeyEnabled,
+    required this.keepRunningInBackground,
   });
 
   final int autoLockMinutes;
   final bool quickUnlockEnabled;
   final bool autofillEnabled;
   final bool desktopHotkeyEnabled;
+  final bool keepRunningInBackground;
 
   Map<String, dynamic> toJson() => {
         'autoLockMinutes': autoLockMinutes,
         'quickUnlockEnabled': quickUnlockEnabled,
         'autofillEnabled': autofillEnabled,
         'desktopHotkeyEnabled': desktopHotkeyEnabled,
+        'keepRunningInBackground': keepRunningInBackground,
       };
 
   factory VaultSettings.fromJson(Map<String, dynamic> json) {
@@ -148,6 +151,7 @@ class VaultSettings {
       quickUnlockEnabled: json['quickUnlockEnabled'] as bool? ?? true,
       autofillEnabled: json['autofillEnabled'] as bool? ?? true,
       desktopHotkeyEnabled: json['desktopHotkeyEnabled'] as bool? ?? true,
+      keepRunningInBackground: json['keepRunningInBackground'] as bool? ?? true,
     );
   }
 
@@ -156,6 +160,7 @@ class VaultSettings {
         quickUnlockEnabled: true,
         autofillEnabled: true,
         desktopHotkeyEnabled: true,
+        keepRunningInBackground: true,
       );
 
   VaultSettings copyWith({
@@ -163,12 +168,15 @@ class VaultSettings {
     bool? quickUnlockEnabled,
     bool? autofillEnabled,
     bool? desktopHotkeyEnabled,
+    bool? keepRunningInBackground,
   }) {
     return VaultSettings(
       autoLockMinutes: autoLockMinutes ?? this.autoLockMinutes,
       quickUnlockEnabled: quickUnlockEnabled ?? this.quickUnlockEnabled,
       autofillEnabled: autofillEnabled ?? this.autofillEnabled,
       desktopHotkeyEnabled: desktopHotkeyEnabled ?? this.desktopHotkeyEnabled,
+      keepRunningInBackground:
+          keepRunningInBackground ?? this.keepRunningInBackground,
     );
   }
 }

@@ -25,6 +25,11 @@ class VaultSettingsScreen extends StatelessWidget {
           onChanged: (value) => store.saveSettings(settings.copyWith(desktopHotkeyEnabled: value)),
           title: const Text('Enable desktop quick launcher'),
         ),
+        SwitchListTile(
+          value: settings.keepRunningInBackground,
+          onChanged: (value) => store.saveSettings(settings.copyWith(keepRunningInBackground: value)),
+          title: const Text('Keep vault running when window closes'),
+        ),
         const SizedBox(height: 12),
         FilledButton(
           onPressed: () => _changePassword(context),
