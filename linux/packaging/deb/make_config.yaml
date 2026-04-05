@@ -1,0 +1,17 @@
+display_name: Kylrix Vault
+package_name: kylrix-vault
+maintainer:
+  name: Kylrix
+  email: hello@kylrix.space
+priority: optional
+section: x11
+installed_size: 6604
+essential: false
+icon: macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_512.png
+keywords:
+  - Kylrix
+  - Vault
+generic_name: Vault
+categories:
+  - Utility
+startup_notify: true

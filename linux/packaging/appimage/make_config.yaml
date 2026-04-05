@@ -1,0 +1,9 @@
+display_name: Kylrix Vault
+generic_name: Vault
+icon: macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_512.png
+keywords:
+  - Kylrix
+  - Vault
+categories:
+  - Utility
+include: []
