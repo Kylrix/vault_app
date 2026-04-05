@@ -14,6 +14,8 @@ import 'vault_crypto.dart';
 import 'vault_database.dart';
 
 class VaultStore extends ChangeNotifier {
+  static const _settingsPrefsKey = 'vault_settings_json';
+
   VaultStore()
       : _database = VaultDatabase(),
         _crypto = VaultCrypto(const FlutterSecureStorage()),
@@ -85,10 +87,11 @@ class VaultStore extends ChangeNotifier {
   }
 
   Future<void> _loadLockedState() async {
-    final payload = await _database.readSettings();
-    if (payload != null && _crypto.isUnlocked) {
+    final prefs = await SharedPreferences.getInstance();
+    final payload = prefs.getString(_settingsPrefsKey);
+    if (payload != null) {
       settings = VaultSettings.fromJson(
-        jsonDecode(await _crypto.decryptString(payload)) as Map<String, dynamic>,
+        jsonDecode(payload) as Map<String, dynamic>,
       );
     }
   }
@@ -131,12 +134,6 @@ class VaultStore extends ChangeNotifier {
     for (final row in totpRows) {
       totpItems.add(await _decodeTotpRecord(row));
     }
-    final payload = await _database.readSettings();
-    if (payload != null) {
-      settings = VaultSettings.fromJson(
-        jsonDecode(await _crypto.decryptString(payload)) as Map<String, dynamic>,
-      );
-    }
     if (isUnlocked) {
       _scheduleAutoLock();
     }
@@ -158,8 +155,8 @@ class VaultStore extends ChangeNotifier {
 
   Future<void> saveSettings(VaultSettings next) async {
     settings = next;
-    final payload = await _crypto.encryptString(jsonEncode(next.toJson()));
-    await _database.writeSettings(payload);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_settingsPrefsKey, jsonEncode(next.toJson()));
     if (isUnlocked) {
       _scheduleAutoLock();
     }
@@ -258,9 +255,13 @@ class VaultStore extends ChangeNotifier {
   Future<void> resetVault() async {
     await _crypto.reset();
     await _database.wipe();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_settingsPrefsKey);
+    await prefs.remove('vault_search_query');
     isUnlocked = false;
     hasInitializedVault = false;
     needsMasterPassword = false;
+    searchQuery = '';
     credentials = [];
     folders = [];
     totpItems = [];

@@ -32,7 +32,7 @@ class VaultSettingsScreen extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         DropdownButtonFormField<int>(
-          value: settings.autoLockMinutes,
+          initialValue: settings.autoLockMinutes,
           decoration: const InputDecoration(labelText: 'Auto-lock after inactivity'),
           items: const [
             DropdownMenuItem(value: 1, child: Text('1 minute')),

@@ -19,6 +19,8 @@ class _VaultAppState extends State<VaultApp> {
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
   DesktopIntegration? _desktopIntegration;
   VaultStore? _store;
+  bool? _lastDesktopHotkeyEnabled;
+  bool? _lastKeepRunningInBackground;
 
   @override
   void didChangeDependencies() {
@@ -33,6 +35,8 @@ class _VaultAppState extends State<VaultApp> {
       store: _store!,
     );
     unawaited(_desktopIntegration!.initialize());
+    _lastDesktopHotkeyEnabled = _store!.settings.desktopHotkeyEnabled;
+    _lastKeepRunningInBackground = _store!.settings.keepRunningInBackground;
   }
 
   @override
@@ -43,6 +47,16 @@ class _VaultAppState extends State<VaultApp> {
   }
 
   void _syncDesktopIntegration() {
+    final store = _store;
+    if (store == null) return;
+    final desktopHotkeyEnabled = store.settings.desktopHotkeyEnabled;
+    final keepRunningInBackground = store.settings.keepRunningInBackground;
+    if (_lastDesktopHotkeyEnabled == desktopHotkeyEnabled &&
+        _lastKeepRunningInBackground == keepRunningInBackground) {
+      return;
+    }
+    _lastDesktopHotkeyEnabled = desktopHotkeyEnabled;
+    _lastKeepRunningInBackground = keepRunningInBackground;
     unawaited(_desktopIntegration?.refresh());
   }
 

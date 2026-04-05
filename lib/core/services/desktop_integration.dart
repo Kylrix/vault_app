@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
+import 'package:flutter/services.dart';
 import 'package:window_manager/window_manager.dart';
 
-import '../screens/vault_quick_launcher.dart';
+import '../../widgets/vault_quick_launcher.dart';
 import 'vault_store.dart';
 
 class DesktopIntegration with WindowListener {
@@ -71,17 +74,23 @@ class DesktopIntegration with WindowListener {
     await windowManager.restore();
     await windowManager.focus();
     if (!store.isUnlocked) return;
-    final context = navigatorKey.currentContext;
-    if (context == null) return;
-    await showDialog<void>(
-      context: context,
-      builder: (_) => const VaultQuickLauncher(),
+    final navigator = navigatorKey.currentState;
+    if (navigator == null) return;
+    await navigator.push(
+      PageRouteBuilder<void>(
+        opaque: false,
+        barrierDismissible: true,
+        barrierColor: Colors.black54,
+        pageBuilder: (context, animation, secondaryAnimation) => const Center(
+          child: VaultQuickLauncher(),
+        ),
+      ),
     );
   }
 
   @override
   void onWindowClose() {
     if (!store.settings.keepRunningInBackground) return;
-    windowManager.hide();
+    unawaited(windowManager.hide());
   }
 }
