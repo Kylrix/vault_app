@@ -25,6 +25,7 @@ class VaultStore extends ChangeNotifier {
   final _uuid = const Uuid();
 
   final Client _client = Client();
+  Timer? _autoLockTimer;
 
   bool isBootstrapping = true;
   bool isUnlocked = false;
@@ -100,6 +101,7 @@ class VaultStore extends ChangeNotifier {
     isUnlocked = true;
     needsMasterPassword = false;
     await refreshUnlocked();
+    _scheduleAutoLock();
     notifyListeners();
   }
 
@@ -109,6 +111,7 @@ class VaultStore extends ChangeNotifier {
     needsMasterPassword = false;
     isUnlocked = true;
     await refreshUnlocked();
+    _scheduleAutoLock();
     notifyListeners();
   }
 
@@ -134,10 +137,14 @@ class VaultStore extends ChangeNotifier {
         jsonDecode(await _crypto.decryptString(payload)) as Map<String, dynamic>,
       );
     }
+    if (isUnlocked) {
+      _scheduleAutoLock();
+    }
     notifyListeners();
   }
 
   Future<void> lock() async {
+    _autoLockTimer?.cancel();
     _crypto.lock();
     isUnlocked = false;
     notifyListeners();
@@ -153,6 +160,9 @@ class VaultStore extends ChangeNotifier {
     settings = next;
     final payload = await _crypto.encryptString(jsonEncode(next.toJson()));
     await _database.writeSettings(payload);
+    if (isUnlocked) {
+      _scheduleAutoLock();
+    }
     notifyListeners();
   }
 
@@ -317,6 +327,22 @@ class VaultStore extends ChangeNotifier {
 
   String generateTotpCode(VaultTotp item) => _totp.generate(item.secret);
   int get totpSecondsRemaining => _totp.secondsRemaining();
+
+  void _scheduleAutoLock() {
+    _autoLockTimer?.cancel();
+    if (!isUnlocked || settings.autoLockMinutes <= 0) return;
+    _autoLockTimer = Timer(
+      Duration(minutes: settings.autoLockMinutes),
+      lock,
+    );
+  }
+
+  @override
+  void dispose() {
+    _autoLockTimer?.cancel();
+    _crypto.lock();
+    super.dispose();
+  }
 }
 
 class AppwriteUser {

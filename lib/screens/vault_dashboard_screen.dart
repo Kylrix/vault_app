@@ -98,15 +98,44 @@ class _QuickActions extends StatelessWidget {
       builder: (dialogContext) => AlertDialog(
         title: const Text('Create credential'),
         content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(controller: title, decoration: const InputDecoration(labelText: 'Title')),
-              TextField(controller: username, decoration: const InputDecoration(labelText: 'Username')),
-              TextField(controller: password, obscureText: true, decoration: const InputDecoration(labelText: 'Password')),
-              TextField(controller: url, decoration: const InputDecoration(labelText: 'URL')),
-              TextField(controller: notes, decoration: const InputDecoration(labelText: 'Notes')),
-            ],
+          child: AutofillGroup(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: title,
+                  decoration: const InputDecoration(labelText: 'Title'),
+                  textInputAction: TextInputAction.next,
+                ),
+                TextField(
+                  controller: username,
+                  decoration: const InputDecoration(labelText: 'Username'),
+                  autofillHints: const [AutofillHints.username],
+                  textInputAction: TextInputAction.next,
+                ),
+                TextField(
+                  controller: password,
+                  obscureText: true,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  decoration: const InputDecoration(labelText: 'Password'),
+                  autofillHints: const [AutofillHints.password],
+                  textInputAction: TextInputAction.next,
+                ),
+                TextField(
+                  controller: url,
+                  decoration: const InputDecoration(labelText: 'URL'),
+                  autofillHints: const [AutofillHints.url],
+                  keyboardType: TextInputType.url,
+                  textInputAction: TextInputAction.next,
+                ),
+                TextField(
+                  controller: notes,
+                  decoration: const InputDecoration(labelText: 'Notes'),
+                  textInputAction: TextInputAction.done,
+                ),
+              ],
+            ),
           ),
         ),
         actions: [
